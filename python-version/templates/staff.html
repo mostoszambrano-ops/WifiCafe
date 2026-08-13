@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel del Personal — WifiCafé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #080808; color: #F0EDE8; font-family: 'Barlow', sans-serif; min-height: 100vh; }
+
+  .top-bar { background: #111111; border-bottom: 1px solid #2A2A2A; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; transition: background 0.3s; }
+  .top-bar.alert { animation: alert-flash 0.8s ease 3; }
+  @keyframes alert-flash { 0%,100%{background:#111111} 25%,75%{background:rgba(245,168,0,0.1)} }
+  .logo-img { width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(245,168,0,0.35)); flex-shrink: 0; }
+  .bar-info { margin-left: 12px; }
+  .bar-title { font-family: 'Bebas Neue', cursive; font-size: 20px; letter-spacing: 2px; color: #F5A800; line-height: 1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .active-badge { background: rgba(245,168,0,0.15); border: 1px solid rgba(245,168,0,0.4); color: #F5A800; font-family: 'Bebas Neue', cursive; font-size: 13px; letter-spacing: 1px; padding: 1px 8px; border-radius: 3px; }
+  .bar-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; color: #555; margin-top: 2px; }
+  .bar-left { display: flex; align-items: center; }
+  .back-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 2px; color: #888; text-decoration: none; border: 1px solid #2A2A2A; padding: 7px 16px; border-radius: 4px; transition: all 0.2s; flex-shrink: 0; }
+  .back-btn:hover { border-color: #F5A800; color: #F5A800; }
+
+  .new-alert { background: #F5A800; color: #000; font-family: 'Bebas Neue', cursive; font-size: 16px; letter-spacing: 3px; text-align: center; padding: 8px; display: none; }
+  .new-alert.show { display: block; }
+
+  .filter-bar { display: flex; gap: 6px; padding: 14px 20px; overflow-x: auto; scrollbar-width: none; flex-wrap: wrap; }
+  .filter-btn { background: none; border: 1px solid #2A2A2A; color: #555; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 2px; padding: 6px 10px; border-radius: 4px; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+  .filter-btn:hover { border-color: #F5A800; color: #F5A800; }
+  .filter-btn.active { border-color: #F5A800; color: #F5A800; background: rgba(245,168,0,0.08); }
+  .filter-chip { background: #1C1C1C; color: #555; border-radius: 3px; padding: 0 5px; font-size: 11px; }
+  .filter-btn.active .filter-chip { background: rgba(245,168,0,0.2); color: #F5A800; }
+
+  .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 14px; padding: 0 20px 60px; }
+  .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 0; color: #555; }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 2px; font-size: 14px; }
+
+  .order-card { background: #161616; border: 1px solid #2A2A2A; border-radius: 10px; overflow: hidden; transition: box-shadow 0.2s; }
+  .order-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+  .order-card.done { background: #0d0d0d; border-color: #1C1C1C; opacity: 0.55; }
+
+  @keyframes pulse-new {
+    0%,100% { box-shadow: 0 0 0 0 rgba(245,168,0,0.5); }
+    50%      { box-shadow: 0 0 0 8px rgba(245,168,0,0); }
+  }
+  .order-card.is-new { border-color: #F5A800; animation: pulse-new 1.6s ease infinite; }
+
+  @keyframes badge-pop { 0%{transform:scale(0.7);opacity:0} 60%{transform:scale(1.15);opacity:1} 100%{transform:scale(1);opacity:1} }
+  .badge-new { animation: badge-pop 0.35s ease forwards; display: inline-block; background: #F5A800; color: #000; font-family: 'Bebas Neue', cursive; font-size: 11px; letter-spacing: 1.5px; padding: 2px 8px; border-radius: 3px; vertical-align: middle; margin-left: 6px; }
+
+  .card-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 10px; border-bottom: 1px solid #1C1C1C; }
+  .card-id { font-family: 'Bebas Neue', cursive; font-size: 22px; color: #F5A800; letter-spacing: 1px; }
+  .card-customer { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; color: #F0EDE8; font-weight: 700; margin-left: 6px; }
+  .card-table { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: #888; margin-left: 4px; }
+  .status-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; padding: 3px 10px; border-radius: 3px; text-transform: uppercase; flex-shrink: 0; }
+  .card-items { padding: 10px 16px; }
+  .card-item-row { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; border-bottom: 1px solid #1C1C1C; }
+  .card-item-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: #aaa; flex: 1; padding-right: 8px; }
+  .card-item-qty { color: #F5A800; font-weight: 700; }
+  .card-item-price { font-family: 'Bebas Neue', cursive; font-size: 13px; color: #555; flex-shrink: 0; }
+  .card-notes { margin-top: 8px; padding: 7px 10px; background: rgba(245,168,0,0.06); border-left: 2px solid #7A5200; border-radius: 0 4px 4px 0; font-size: 12px; color: #999; font-style: italic; }
+  .card-foot { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 14px; }
+  .card-total { font-family: 'Bebas Neue', cursive; font-size: 22px; color: #F5A800; letter-spacing: 1px; }
+  .card-time { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: #555; margin-top: 1px; }
+  .card-actions { display: flex; gap: 8px; align-items: center; }
+  .del-btn { background: transparent; border: 1px solid #2A2A2A; color: #555; font-size: 13px; padding: 7px 11px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .del-btn:hover { background: rgba(239,68,68,0.15); border-color: #EF4444; color: #EF4444; }
+  .action-btn { border: none; font-family: 'Bebas Neue', cursive; font-size: 15px; letter-spacing: 1px; padding: 9px 18px; border-radius: 4px; cursor: pointer; transition: all 0.2s; color: #000; }
+  .action-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  /* PIN screen */
+  #pin-screen { position: fixed; inset: 0; background: #080808; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 24px; }
+  #pin-screen.hidden { display: none; }
+  .pin-label { text-align: center; }
+  .pin-label-title { font-family: 'Bebas Neue', cursive; font-size: 26px; letter-spacing: 3px; color: #F5A800; }
+  .pin-label-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 3px; color: #555; margin-top: 4px; }
+  .pin-dots { display: flex; gap: 16px; }
+  .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: transparent; border: 2px solid #444; transition: all 0.15s; }
+  .pin-dot.filled { background: #F5A800; border-color: #F5A800; }
+  .pin-dot.error { background: #EF4444; border-color: #EF4444; }
+  .pin-error-msg { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 2px; color: #EF4444; height: 18px; }
+  .pin-grid { display: grid; grid-template-columns: repeat(3, 72px); gap: 12px; }
+  .pin-key { width: 72px; height: 72px; border-radius: 12px; background: #161616; border: 1px solid #2A2A2A; color: #F0EDE8; font-family: 'Bebas Neue', cursive; font-size: 28px; cursor: pointer; transition: all 0.15s; }
+  .pin-key:hover { border-color: #F5A800; color: #F5A800; }
+  .pin-key.del { background: transparent; color: #555; font-size: 22px; }
+  .pin-key.del:hover { border-color: #F5A800; color: #F5A800; }
+  .pin-key.empty { visibility: hidden; cursor: default; }
+</style>
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <img src="/static/logo.png" alt="WifiCafé" style="width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(245,168,0,0.4))">
+  <div class="pin-label">
+    <div class="pin-label-title">Panel del Personal</div>
+    <div class="pin-label-sub">INGRESA TU PIN</div>
+  </div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot" id="dot-0"></div>
+    <div class="pin-dot" id="dot-1"></div>
+    <div class="pin-dot" id="dot-2"></div>
+    <div class="pin-dot" id="dot-3"></div>
+  </div>
+  <div class="pin-error-msg" id="pin-error-msg"></div>
+  <div class="pin-grid">
+    <button class="pin-key" onclick="pinKey('1')">1</button>
+    <button class="pin-key" onclick="pinKey('2')">2</button>
+    <button class="pin-key" onclick="pinKey('3')">3</button>
+    <button class="pin-key" onclick="pinKey('4')">4</button>
+    <button class="pin-key" onclick="pinKey('5')">5</button>
+    <button class="pin-key" onclick="pinKey('6')">6</button>
+    <button class="pin-key" onclick="pinKey('7')">7</button>
+    <button class="pin-key" onclick="pinKey('8')">8</button>
+    <button class="pin-key" onclick="pinKey('9')">9</button>
+    <button class="pin-key empty" disabled></button>
+    <button class="pin-key" onclick="pinKey('0')">0</button>
+    <button class="pin-key del" onclick="pinDel()">⌫</button>
+  </div>
+</div>
+
+<div class="top-bar" id="top-bar">
+  <div class="bar-left">
+    <img src="/static/logo.png" alt="WifiCafé" class="logo-img">
+    <div class="bar-info">
+      <div class="bar-title">
+        Panel del Personal
+        <span class="active-badge" id="active-badge" style="display:none"></span>
+      </div>
+      <div class="bar-sub" id="last-update">Cargando...</div>
+    </div>
+  </div>
+  <a href="/" class="back-btn">← Menú</a>
+</div>
+
+<div class="new-alert" id="new-alert">🔔 NUEVO PEDIDO RECIBIDO</div>
+
+<div class="filter-bar" id="filter-bar"></div>
+<div class="orders-grid" id="orders-grid"></div>
+
+<script>
+/* ── PIN LOCK ── */
+const STAFF_PIN = '1904';
+const SESSION_KEY = 'wificafe_staff_auth';
+let pinInput = '';
+
+function pinUpdateDots(error) {
+  for(let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.className = 'pin-dot' + (error ? ' error' : i < pinInput.length ? ' filled' : '');
+  }
+}
+
+function pinKey(digit) {
+  const errMsg = document.getElementById('pin-error-msg');
+  if(errMsg.textContent) { errMsg.textContent = ''; }
+  if(pinInput.length >= STAFF_PIN.length) return;
+  pinInput += digit;
+  pinUpdateDots(false);
+  if(pinInput.length === STAFF_PIN.length) {
+    if(pinInput === STAFF_PIN) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      document.getElementById('pin-screen').classList.add('hidden');
+      fetchOrders();
+      setInterval(fetchOrders, 5000);
+    } else {
+      pinUpdateDots(true);
+      errMsg.textContent = 'PIN incorrecto';
+      setTimeout(() => { pinInput = ''; pinUpdateDots(false); errMsg.textContent = ''; }, 700);
+    }
+  }
+}
+
+function pinDel() {
+  pinInput = pinInput.slice(0, -1);
+  pinUpdateDots(false);
+  document.getElementById('pin-error-msg').textContent = '';
+}
+
+if(sessionStorage.getItem(SESSION_KEY) === '1') {
+  document.getElementById('pin-screen').classList.add('hidden');
+}
+
+/* ── DASHBOARD ── */
+const STATUS_META = {
+  pendiente:  {label:'Sin Pago',   color:'#F5A800', bg:'rgba(245,168,0,0.12)',  next:'pagado',     nextLabel:'💰 Cobrar'},
+  pagado:     {label:'Pagado',     color:'#4ADE80', bg:'rgba(74,222,128,0.12)', next:'preparando', nextLabel:'▶ Preparar'},
+  preparando: {label:'Preparando', color:'#60A5FA', bg:'rgba(96,165,250,0.12)', next:'listo',      nextLabel:'✓ Listo'},
+  listo:      {label:'Listo',      color:'#A78BFA', bg:'rgba(167,139,250,0.12)',next:null,         nextLabel:null},
+};
+
+let allOrders = [];
+let activeFilter = 'activo';
+let prevActiveCount = null;
+
+function timeAgo(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if(diff < 60) return `hace ${diff}s`;
+  if(diff < 3600) return `hace ${Math.floor(diff/60)}min`;
+  return `hace ${Math.floor(diff/3600)}h`;
+}
+function isNew(dateStr) {
+  return Date.now() - new Date(dateStr).getTime() < 90000;
+}
+function fmtPrice(n) { return Number(n).toLocaleString('es-VE') + '$'; }
+
+function getCounts() {
+  return {
+    activo:     allOrders.filter(o=>o.status!=='listo').length,
+    pendiente:  allOrders.filter(o=>o.status==='pendiente').length,
+    pagado:     allOrders.filter(o=>o.status==='pagado').length,
+    preparando: allOrders.filter(o=>o.status==='preparando').length,
+    listo:      allOrders.filter(o=>o.status==='listo').length,
+    todos:      allOrders.length,
+  };
+}
+
+function renderFilters() {
+  const c = getCounts();
+  const tabs = [
+    {key:'activo',    label:'Activos'},
+    {key:'pendiente', label:'Sin Pago'},
+    {key:'pagado',    label:'Pagado'},
+    {key:'preparando',label:'Preparando'},
+    {key:'listo',     label:'Listos'},
+    {key:'todos',     label:'Todos'},
+  ];
+  document.getElementById('filter-bar').innerHTML = tabs.map(t =>
+    `<button class="filter-btn${t.key===activeFilter?' active':''}" onclick="setFilter('${t.key}')">
+       ${t.label}<span class="filter-chip">${c[t.key]||0}</span>
+     </button>`
+  ).join('');
+
+  const activeCount = c.activo;
+  document.title = activeCount > 0 ? `(${activeCount}) Panel del Personal` : 'Panel del Personal';
+  const badge = document.getElementById('active-badge');
+  if(activeCount > 0) {
+    badge.style.display = '';
+    badge.textContent = activeCount + ' activo' + (activeCount!==1?'s':'');
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function setFilter(f) { activeFilter=f; renderFilters(); renderOrders(); }
+
+function renderOrders() {
+  const filtered = activeFilter==='activo'
+    ? allOrders.filter(o=>o.status!=='listo')
+    : activeFilter==='todos'
+    ? allOrders
+    : allOrders.filter(o=>o.status===activeFilter);
+
+  const grid = document.getElementById('orders-grid');
+  if(filtered.length===0) {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-text">No hay pedidos en esta categoría</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(order => {
+    const meta = STATUS_META[order.status] || STATUS_META.pendiente;
+    const isDone = order.status === 'listo';
+    const orderIsNew = isNew(order.created_at) && !isDone;
+    const itemRows = (order.items||[]).map(i =>
+      `<div class="card-item-row">
+        <span class="card-item-name"><span class="card-item-qty">${i.quantity}×</span> ${i.item_name}</span>
+        <span class="card-item-price">${fmtPrice(i.item_price_num*i.quantity)}</span>
+      </div>`
+    ).join('');
+    const notes = order.notes ? `<div class="card-notes">📝 ${order.notes}</div>` : '';
+    const actionBtn = meta.next
+      ? `<button class="action-btn" style="background:${meta.color}" onclick="updateStatus(${order.id},'${meta.next}')">${meta.nextLabel}</button>`
+      : '';
+    const newBadge = orderIsNew ? `<span class="badge-new">NUEVO</span>` : '';
+
+    return `<div class="order-card${isDone?' done':''}${orderIsNew?' is-new':''}">
+      <div class="card-head">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">
+          <span class="card-id">#${order.id}</span>
+          <span class="card-customer">${order.customer_name}</span>
+          ${order.table_number?`<span class="card-table">· ${order.table_number}</span>`:''}
+          ${newBadge}
+        </div>
+        <span class="status-badge" style="background:${meta.bg};color:${meta.color}">${meta.label}</span>
+      </div>
+      <div class="card-items">${itemRows}${notes}</div>
+      <div class="card-foot">
+        <div>
+          <div class="card-total">${fmtPrice(order.total)}</div>
+          <div class="card-time">${timeAgo(order.created_at)}</div>
+        </div>
+        <div class="card-actions">
+          <button class="del-btn" onclick="deleteOrder(${order.id})" title="Eliminar pedido">🗑</button>
+          ${actionBtn}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function fetchOrders() {
+  try {
+    const res = await fetch('/api/orders');
+    if(res.ok) {
+      const data = await res.json();
+      const newActiveCount = data.filter(o=>o.status!=='listo').length;
+
+      if(prevActiveCount !== null && newActiveCount > prevActiveCount) {
+        const topBar = document.getElementById('top-bar');
+        const alertBanner = document.getElementById('new-alert');
+        topBar.classList.add('alert');
+        alertBanner.classList.add('show');
+        setTimeout(()=>{ topBar.classList.remove('alert'); alertBanner.classList.remove('show'); }, 3000);
+      }
+      prevActiveCount = newActiveCount;
+
+      allOrders = data;
+      renderFilters();
+      renderOrders();
+      document.getElementById('last-update').textContent = '↻ cada 5s · actualizado ahora';
+    }
+  } catch {}
+}
+
+async function updateStatus(id, status) {
+  await fetch(`/api/orders/${id}`, {
+    method:'PATCH', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({status})
+  });
+  fetchOrders();
+}
+
+async function deleteOrder(id) {
+  if(!confirm('¿Eliminar este pedido?')) return;
+  await fetch(`/api/orders/${id}`, {method:'DELETE'});
+  fetchOrders();
+}
+
+if(sessionStorage.getItem(SESSION_KEY) === '1') {
+  fetchOrders();
+  setInterval(fetchOrders, 5000);
+}
+</script>
+</body>
+</html>

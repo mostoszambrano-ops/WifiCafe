@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WifiCafé — Menú</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: #080808; color: #F0EDE8; font-family: 'Barlow', sans-serif; min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+
+  .header { position: relative; text-align: center; padding: 40px 20px 32px; border-bottom: 1px solid #2A2A2A; overflow: hidden; }
+  .header-glow { position: absolute; top: -80px; left: 50%; transform: translateX(-50%); width: 320px; height: 200px; background: radial-gradient(ellipse, rgba(245,168,0,.12) 0%, transparent 70%); pointer-events: none; }
+  .header-line { position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 120px; height: 2px; background: #F5A800; }
+  .logo-img { width: 110px; height: 110px; object-fit: contain; display: block; margin: 0 auto 10px; filter: drop-shadow(0 0 18px rgba(245,168,0,0.4)); }
+  .tagline { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 5px; color: #888; text-transform: uppercase; margin-bottom: 10px; }
+  .contact { display: flex; gap: 20px; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: #888; letter-spacing: 2px; }
+  .contact a { color: #F5A800; }
+
+  .protein-strip { background: #0D0D0D; border-bottom: 1px solid #2A2A2A; padding: 18px 20px; }
+  .protein-strip-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 4px; color: #7A5200; text-transform: uppercase; margin-bottom: 12px; text-align: center; }
+  .protein-cards { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .protein-card { display: flex; flex-direction: column; align-items: center; gap: 4px; background: #111111; border: 1px solid #1C1C1C; border-radius: 8px; padding: 10px 8px; cursor: default; transition: all 0.22s; min-width: 72px; }
+  .protein-card:hover { border-color: #7A5200; background: rgba(245,168,0,0.07); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(245,168,0,0.15); }
+  .protein-card:hover .protein-name { color: #F5A800; }
+  .protein-emoji { font-size: 22px; line-height: 1; }
+  .protein-name { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; color: #888; text-align: center; line-height: 1.2; transition: color 0.22s; }
+
+  .nav-wrap { position: sticky; top: 0; z-index: 100; background: rgba(8,8,8,.95); backdrop-filter: blur(12px); border-bottom: 1px solid #2A2A2A; }
+  .nav-hint { text-align: center; font-size: 11px; color: #555; padding: 6px; letter-spacing: 1px; font-family: 'Barlow Condensed', sans-serif; }
+  .nav { display: flex; overflow-x: auto; padding: 0 12px; gap: 2px; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn { flex-shrink: 0; background: none; border: none; color: #555; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; padding: 14px; cursor: pointer; position: relative; transition: color 0.2s; white-space: nowrap; }
+  .nav-btn::after { content: ''; position: absolute; bottom: 0; left: 50%; right: 50%; height: 2px; background: #F5A800; transition: left 0.25s, right 0.25s; }
+  .nav-btn.active { color: #F5A800; }
+  .nav-btn.active::after { left: 0; right: 0; }
+  .nav-btn:hover:not(.active) { color: #F0EDE8; }
+
+  main { max-width: 680px; margin: 0 auto; padding: 0 14px 100px; }
+  .section-content { animation: fadeUp 0.35s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .section-header { display: flex; align-items: center; gap: 12px; padding: 28px 0 16px; }
+  .section-header span { font-size: 26px; line-height: 1; }
+  .section-header h2 { font-family: 'Bebas Neue', cursive; font-size: 32px; letter-spacing: 3px; color: #F5A800; }
+  .sub-header { display: flex; align-items: center; gap: 12px; padding: 20px 0 10px; }
+  .sub-header span { font-size: 22px; }
+  .sub-header h3 { font-family: 'Bebas Neue', cursive; font-size: 22px; letter-spacing: 3px; color: #F5A800; }
+  .section-note { font-size: 12px; color: #888; margin: -10px 0 16px; padding: 10px 14px; border-left: 2px solid #7A5200; font-style: italic; line-height: 1.5; }
+
+  .menu-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #2A2A2A; gap: 12px; }
+  .menu-row.sep { border-top: 1px solid #7A5200; margin-top: 10px; padding-top: 18px; }
+  .menu-row-info { flex: 1; }
+  .menu-row-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; color: #F0EDE8; line-height: 1.2; }
+  .menu-row-desc { font-size: 12px; color: #888; margin-top: 2px; }
+  .menu-row-right { display: flex; align-items: center; gap: 10px; }
+  .menu-price { font-family: 'Bebas Neue', cursive; font-size: 20px; color: #F5A800; white-space: nowrap; }
+  .add-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #F5A800; background: transparent; color: #F5A800; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+  .add-btn:hover { background: #F5A800; color: #000; }
+  .mini-add-btn { width: 22px; height: 22px; border-radius: 50%; border: 1px solid #F5A800; background: transparent; color: #F5A800; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+  .mini-add-btn:hover { background: #F5A800; color: #000; }
+
+  .combo-card { background: #161616; border: 1px solid #7A5200; border-radius: 8px; padding: 18px 20px; margin-bottom: 14px; position: relative; overflow: hidden; transition: all 0.2s; }
+  .combo-card:hover { border-color: #F5A800; box-shadow: 0 0 20px rgba(245,168,0,0.1); }
+  .combo-accent { position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: #F5A800; }
+  .combo-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 3px; color: #F5A800; text-transform: uppercase; margin-bottom: 4px; }
+  .combo-name { font-family: 'Bebas Neue', cursive; font-size: 22px; letter-spacing: 2px; color: #F0EDE8; margin-bottom: 8px; }
+  .combo-includes { font-size: 12px; color: #888; line-height: 1.7; }
+  .combo-includes div { padding-left: 14px; position: relative; }
+  .combo-includes div::before { content: '✓'; position: absolute; left: 0; color: #F5A800; font-size: 11px; }
+  .combo-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+  .combo-price { font-family: 'Bebas Neue', cursive; font-size: 30px; color: #F5A800; letter-spacing: 2px; }
+  .combo-add-btn { background: #F5A800; color: #000; border: none; border-radius: 4px; padding: 6px 16px; font-family: 'Bebas Neue', cursive; font-size: 15px; letter-spacing: 1px; cursor: pointer; transition: opacity 0.15s; }
+  .combo-add-btn:hover { opacity: 0.85; }
+
+  .drink-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #111111; border-radius: 6px; margin-bottom: 6px; border: 1px solid transparent; transition: all 0.2s; }
+  .drink-item:hover { border-color: #2A2A2A; background: #161616; }
+  .drink-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; color: #F0EDE8; }
+  .drink-right { display: flex; align-items: center; gap: 10px; }
+  .drink-price { font-family: 'Bebas Neue', cursive; font-size: 18px; color: #F5A800; }
+
+  .adicionales-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .add-item { background: #1C1C1C; border: 1px solid #2A2A2A; border-radius: 6px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+  .add-item:hover { border-color: #7A5200; background: #161616; transform: translateY(-1px); }
+  .add-item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 14px; color: #F0EDE8; }
+  .add-item-right { display: flex; align-items: center; gap: 8px; }
+  .add-item-price { font-family: 'Bebas Neue', cursive; font-size: 16px; color: #F5A800; }
+
+  .cart-fab { position: fixed; bottom: 24px; right: 24px; z-index: 150; width: 60px; height: 60px; border-radius: 50%; background: #F5A800; border: none; cursor: pointer; display: none; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(245,168,0,0.4); transition: transform 0.2s, box-shadow 0.2s; }
+  .cart-fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(245,168,0,0.5); }
+  .cart-fab-icon { font-size: 22px; line-height: 1; }
+  .cart-fab-count { font-family: 'Bebas Neue', cursive; font-size: 13px; color: #000; letter-spacing: 1px; }
+
+  .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; backdrop-filter: blur(4px); display: none; }
+  .cart-overlay.open { display: block; }
+  .cart-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); background: #111111; z-index: 201; display: flex; flex-direction: column; border-left: 1px solid #2A2A2A; transform: translateX(100%); transition: transform 0.3s ease; }
+  .cart-drawer.open { transform: translateX(0); }
+  .cart-header { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid #2A2A2A; }
+  .cart-title { font-family: 'Bebas Neue', cursive; font-size: 22px; letter-spacing: 2px; color: #F5A800; }
+  .cart-subtitle { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: #888; }
+  .cart-close { background: none; border: none; color: #888; font-size: 22px; cursor: pointer; }
+  .cart-scroll { flex: 1; overflow-y: auto; padding: 0 20px; }
+  .cart-empty { text-align: center; padding: 60px 0; color: #555; }
+  .cart-empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .cart-empty-text { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 2px; font-size: 14px; }
+  .cart-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #1C1C1C; }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; color: #F0EDE8; line-height: 1.3; }
+  .cart-item-price { font-family: 'Bebas Neue', cursive; font-size: 16px; color: #F5A800; margin-top: 2px; }
+  .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+  .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #3A3A3A; background: #1C1C1C; color: #F0EDE8; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .qty-btn:hover { border-color: #F5A800; }
+  .qty-num { font-family: 'Bebas Neue', cursive; font-size: 18px; color: #F5A800; min-width: 20px; text-align: center; }
+  .cart-item-subtotal { font-family: 'Bebas Neue', cursive; font-size: 16px; color: #888; min-width: 70px; text-align: right; }
+  .cart-footer { padding: 20px; border-top: 1px solid #2A2A2A; background: #0d0d0d; }
+  .cart-total-row { display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center; }
+  .cart-total-label { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; letter-spacing: 2px; color: #888; text-transform: uppercase; }
+  .cart-total-val { font-family: 'Bebas Neue', cursive; font-size: 24px; color: #F5A800; }
+  .btn-primary { width: 100%; background: #F5A800; color: #000; border: none; border-radius: 6px; padding: 14px; font-family: 'Bebas Neue', cursive; font-size: 20px; letter-spacing: 2px; cursor: pointer; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-secondary { flex: 1; background: transparent; color: #888; border: 1px solid #2A2A2A; border-radius: 6px; padding: 12px; font-family: 'Bebas Neue', cursive; font-size: 16px; letter-spacing: 1px; cursor: pointer; }
+
+  .checkout-summary-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 3px; color: #7A5200; text-transform: uppercase; margin-bottom: 12px; }
+  .checkout-summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1C1C1C; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: #888; }
+  .checkout-summary-price { font-family: 'Bebas Neue', cursive; font-size: 14px; color: #F5A800; }
+  .checkout-total-row { display: flex; justify-content: space-between; padding: 12px 0; }
+  .form-label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 2px; color: #888; text-transform: uppercase; display: block; margin-bottom: 6px; margin-top: 16px; }
+  .form-input { width: 100%; background: #1C1C1C; border: 1px solid #2A2A2A; border-radius: 6px; color: #F0EDE8; padding: 10px 14px; font-family: 'Barlow', sans-serif; font-size: 14px; outline: none; }
+  .form-input:focus { border-color: #7A5200; }
+  textarea.form-input { resize: vertical; min-height: 70px; }
+
+  .success-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; text-align: center; }
+  .success-icon { font-size: 56px; margin-bottom: 16px; }
+  .success-title { font-family: 'Bebas Neue', cursive; font-size: 28px; letter-spacing: 3px; color: #F5A800; margin-bottom: 8px; }
+  .success-msg { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 32px; }
+  .btn-success { background: #F5A800; color: #000; border: none; border-radius: 6px; padding: 12px 32px; font-family: 'Bebas Neue', cursive; font-size: 18px; letter-spacing: 2px; cursor: pointer; }
+
+  .picker-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 300; backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 20px; }
+  .picker-overlay.open { display: flex; }
+  .picker-modal { background: #161616; border: 1px solid #2A2A2A; border-radius: 12px; width: 100%; max-width: 420px; overflow: hidden; }
+  .picker-header { padding: 20px 20px 14px; border-bottom: 1px solid #2A2A2A; }
+  .picker-header-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 3px; color: #7A5200; text-transform: uppercase; margin-bottom: 4px; }
+  .picker-item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; color: #F0EDE8; }
+  .picker-meta { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+  .picker-meta-label { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; color: #888; }
+  .picker-dots { margin-left: auto; display: flex; gap: 4px; }
+  .picker-dot { width: 8px; height: 8px; border-radius: 50%; background: #2A2A2A; transition: background 0.2s; }
+  .picker-dot.filled { background: #F5A800; }
+  .picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px; }
+  .picker-protein-btn { background: #1C1C1C; border: 1px solid #2A2A2A; border-radius: 8px; padding: 12px 10px; cursor: pointer; transition: all 0.18s; text-align: left; display: flex; align-items: center; gap: 10px; position: relative; }
+  .picker-protein-btn:hover:not(:disabled) { border-color: #7A5200; background: rgba(245,168,0,0.05); }
+  .picker-protein-btn.selected { background: rgba(245,168,0,0.15); border-color: #F5A800; }
+  .picker-protein-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .picker-protein-emoji { font-size: 26px; line-height: 1; }
+  .picker-protein-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; color: #F0EDE8; line-height: 1.2; }
+  .picker-protein-btn.selected .picker-protein-label { color: #F5A800; }
+  .picker-checkmark { position: absolute; top: 6px; right: 8px; font-size: 11px; color: #F5A800; display: none; }
+  .picker-protein-btn.selected .picker-checkmark { display: block; }
+  .picker-footer { padding: 0 14px 14px; display: flex; gap: 8px; }
+  .picker-cancel { flex: 1; background: transparent; border: 1px solid #2A2A2A; color: #888; font-family: 'Bebas Neue', cursive; font-size: 16px; letter-spacing: 1px; border-radius: 6px; padding: 11px; cursor: pointer; }
+  .picker-confirm { flex: 2; background: #2A2A2A; color: #555; border: none; font-family: 'Bebas Neue', cursive; font-size: 18px; letter-spacing: 2px; border-radius: 6px; padding: 11px; cursor: not-allowed; transition: all 0.2s; }
+  .picker-confirm.ready { background: #F5A800; color: #000; cursor: pointer; }
+
+  footer { text-align: center; padding: 30px 20px; border-top: 1px solid #2A2A2A; color: #555; font-size: 12px; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 2px; }
+  footer strong { color: #F5A800; }
+  footer a { color: #2A2A2A; font-size: 10px; display: inline-block; margin-top: 8px; }
+  footer a:hover { color: #555; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-glow"></div>
+  <div class="header-line"></div>
+  <img src="/static/logo.png" alt="WifiCafé" class="logo-img">
+  <p class="tagline">Comida Rica · Señal Fuerte</p>
+  <div class="contact">
+    <a href="https://www.instagram.com/wificafe.sc?igsh=MTRsOGliMGNhOW15Mg%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" style="background:rgba(245,168,0,0.08);border:1px solid rgba(245,168,0,0.25);border-radius:20px;padding:5px 14px;color:#F5A800;display:inline-flex;align-items:center;gap:6px">📸 @wificafe.sc</a>
+    <a href="https://wa.me/584247126151" target="_blank" rel="noopener noreferrer" style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.25);border-radius:20px;padding:5px 14px;color:#25D366;display:inline-flex;align-items:center;gap:6px">💬 WhatsApp</a>
+    <a href="tel:+584247126151" style="background:rgba(255,255,255,0.04);border:1px solid #2A2A2A;border-radius:20px;padding:5px 14px;color:#888;display:inline-flex;align-items:center;gap:6px">📞 0424-712.6151</a>
+  </div>
+</header>
+
+<div class="protein-strip">
+  <p class="protein-strip-label">Proteínas disponibles</p>
+  <div class="protein-cards" id="protein-cards"></div>
+</div>
+
+<div class="nav-wrap">
+  <div class="nav-hint">← desliza →</div>
+  <nav class="nav" id="nav"></nav>
+</div>
+
+<main id="main"></main>
+
+<footer>
+  <strong>WifiCafé</strong> · @wificafesc · 0424-712.6151<br>
+  <a href="/staff">Panel del personal</a>
+</footer>
+
+<button class="cart-fab" id="cart-fab" onclick="openCart()">
+  <div class="cart-fab-icon">🛒</div>
+  <div class="cart-fab-count" id="cart-count">0</div>
+</button>
+
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <div>
+      <div class="cart-title" id="cart-title">Tu Pedido</div>
+      <div class="cart-subtitle" id="cart-subtitle"></div>
+    </div>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div id="cart-body" style="display:flex;flex-direction:column;flex:1;overflow:hidden;"></div>
+</div>
+
+<div class="picker-overlay" id="picker-overlay" onclick="closePicker()">
+  <div class="picker-modal" onclick="event.stopPropagation()">
+    <div class="picker-header">
+      <div class="picker-header-label">Eligiendo proteína para</div>
+      <div class="picker-item-name" id="picker-item-name"></div>
+      <div class="picker-meta">
+        <div class="picker-meta-label" id="picker-meta-label"></div>
+        <div class="picker-dots" id="picker-dots"></div>
+      </div>
+    </div>
+    <div class="picker-grid" id="picker-grid"></div>
+    <div class="picker-footer">
+      <button class="picker-cancel" onclick="closePicker()">Cancelar</button>
+      <button class="picker-confirm" id="picker-confirm" onclick="confirmPicker()">Elige proteínas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PROTEINS = ['Pollo Crispy','Carne Mechada','Pollo Mechado','Lomo de Cerdo','Milanesa de Pollo','Tocineta','Chorizo'];
+const PROTEIN_EMOJI = {'Pollo Crispy':'🍗','Carne Mechada':'🥩','Pollo Mechado':'🫕','Lomo de Cerdo':'🐷','Milanesa de Pollo':'🍖','Tocineta':'🥓','Chorizo':'🌭'};
+
+const SECTIONS = [
+  {id:'cachapas',   label:'Cachapas',     emoji:'🌽'},
+  {id:'burgers',    label:'Hamburguesas', emoji:'🍔'},
+  {id:'hotdogs',    label:'Perros',       emoji:'🌭'},
+  {id:'burritos',   label:'Burritos',     emoji:'🌯'},
+  {id:'morocho',    label:'Morocho',      emoji:'🥗'},
+  {id:'especiales', label:'Especiales',   emoji:'⭐'},
+  {id:'papas',      label:'Papas',        emoji:'🍟'},
+  {id:'combos',     label:'Combos',       emoji:'🔥'},
+  {id:'adicionales',label:'Adicionales',  emoji:'➕'},
+  {id:'bebidas',    label:'Bebidas',      emoji:'🥤'},
+];
+
+const CACHAPAS = [
+  {name:'Queso Mozzarella',              price:'14.000$'},
+  {name:'Queso Mozzarella + Jamón',      price:'16.000$'},
+  {name:'Mozzarella + Jamón',  desc:'+ 1 Proteína a elegir',  price:'23.000$'},
+  {name:'Mozzarella + Jamón',  desc:'+ 2 Proteínas a elegir', price:'28.000$'},
+  {name:'Mozzarella + Jamón',  desc:'+ 3 Proteínas a elegir', price:'35.000$'},
+  {name:'Queso de Mano',                 price:'20.000$', sep:true},
+  {name:'Queso de Mano + Jamón',         price:'21.000$'},
+  {name:'Queso de Mano + Jamón', desc:'+ 1 Proteína a elegir',  price:'28.000$'},
+  {name:'Queso de Mano + Jamón', desc:'+ 2 Proteínas a elegir', price:'33.000$'},
+  {name:'Queso de Mano + Jamón', desc:'+ 3 Proteínas a elegir', price:'41.000$'},
+];
+const BURGERS_NOTE = '🍟 Todas las hamburguesas incluyen un servicio de 100g de papas fritas';
+const BURGERS = [
+  {name:'Wi-Fi Croqueta',                       price:'14.000$'},
+  {name:'Wi-Fi Doble Croqueta + Queso Fundido', price:'21.000$'},
+  {name:'Wi-Fi Pollo Crispy',                   price:'16.000$'},
+  {name:'Wi-Fi Milanesa de Pollo',              price:'16.000$'},
+  {name:'Wi-Fi Pollo Mechado',                  price:'16.000$'},
+  {name:'Wi-Fi Carne Mechada',                  price:'16.000$'},
+  {name:'Wi-Fi Lomo de Cerdo',                  price:'16.000$'},
+  {name:'Doble Wi-Fi',  desc:'2 Proteínas a elegir', price:'23.000$'},
+  {name:'Súper Wi-Fi',  desc:'4 Proteínas a elegir', price:'31.000$'},
+];
+const HOTDOGS = [
+  {name:'Hot Dog Sencillo',      price:'7.000$'},
+  {name:'Hot Dog Pollo Mechado', price:'12.000$'},
+  {name:'Hot Dog Carne Mechada', price:'12.000$'},
+];
+const BURRITOS_NOTE = 'Todos incluyen: Lechuga · Tomate · Cebolla · Jamón · Queso amarillo · Tocineta · Huevo · Papas fritas · Salsas';
+const BURRITOS = [
+  {name:'Burrito', desc:'+ 1 Proteína a elegir',  price:'17.500$'},
+  {name:'Burrito', desc:'+ 2 Proteínas a elegir', price:'23.000$'},
+];
+const MOROCHO = [
+  {badge:'Normal',      name:'Morocho Normal',   includes:['Pan de perro · Vegetales · Pollo mechado','Carne mechada · Salchicha · Jamón · Queso','Huevo · Papas fritas · Salsa'], price:'24.000$'},
+  {badge:'⭐ Especial', name:'Morocho Especial',  includes:['Pan de perro · Vegetales · Pollo mechado','Carne mechada · Salchicha · Lomo de cerdo','Chorizo · Jamón · Queso · Huevo · Papas fritas · Salsa'], price:'30.000$'},
+];
+const ESPECIALES = [
+  {badge:'Especialidad',      name:'Granjero',                    includes:['1 Proteína a elegir','Pollo Mechado · Carne Mechada · Pollo Crispy · Lomo de Cerdo · Milanesa'], price:'19.000$'},
+  {badge:'Club',              name:'Club House',                  includes:['Lechuga · Tomate · Cebolla · Huevo','Pollo Mechado · Jamón · Queso','Papas Fritas'], price:'25.000$'},
+  {badge:'🤝 Para Compartir', name:'Picada o Parrillada al Barril', includes:['Carne · Pollo · Chorizo','Ensalada · Queso · Papas fritas · Salsas'], price:'32.000$'},
+];
+const ENSALADAS = [
+  {badge:'🥗 Ensalada', name:'Ensalada César',                includes:['Lechuga · Tomate · Crutones · Queso Parmesano','Aderezo César'], price:'7.000$'},
+  {badge:'🥗 Ensalada', name:'Ensalada César + Pollo Crispy', includes:['Lechuga · Tomate · Crutones · Queso Parmesano','Aderezo César · Pollo Crispy'], price:'12.000$'},
+];
+const PAPAS = [
+  {name:'Salchipapa',      desc:'Papas fritas · Salchicha · Queso amarillo',   price:'13.000$'},
+  {name:'Papipollo',       desc:'Papas fritas · Pollo Crispy · Queso amarillo', price:'18.000$'},
+  {name:'Servicio de Papas',                                                    price:'7.000$'},
+  {name:'Papas Especiales', desc:'Queso amarillo fundido + Tocineta',           price:'12.000$'},
+];
+const COMBOS = [
+  {badge:'🔥 Combo',            name:'Combo Hamburguesa', includes:['2 Hamburguesas Croqueta','Servicio de Papas Fritas','2 Vasos de Refresco'], price:'24.000$'},
+  {badge:'🔥 Combo',            name:'Combo Perros',      includes:['2 Hot Dog (Sencillo o Especial)','2 Vasos de Refresco'], price:'15.000$'},
+  {badge:'👨‍👩‍👧‍👦 Para 4 Personas', name:'Mega Burguer',     includes:['1 Hamburguesa gigante para 4 personas','Elige 2 Proteínas','Refresco de 1 Litro'], price:'50.000$', desc:'2 Proteínas a elegir'},
+];
+const ADICIONALES = [
+  {name:'Tocineta',price:'6.000$'},{name:'Maíz',price:'2.000$'},
+  {name:'Huevo',price:'1.000$'},{name:'Pollo Crispy',price:'9.000$'},
+  {name:'Milanesa Pollo',price:'8.000$'},{name:'Croqueta',price:'7.000$'},
+  {name:'Pollo Mechado',price:'8.000$'},{name:'Carne Mechada',price:'8.000$'},
+  {name:'Lomo Ahumado',price:'8.000$'},{name:'Aros de Cebolla',price:'5.000$'},
+];
+const BEBIDAS = [
+  {name:'Refresco 2 Litros',price:'8.000$'},{name:'Refresco 1 Litro',price:'5.000$'},
+  {name:'Refresco Individual',price:'3.000$'},{name:'Vaso de Refresco',price:'2.000$'},
+  {name:'Jugos (Yukery / Yuky Park)',price:'4.000$'},
+];
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function parsePrice(p) { return parseInt(p.replace(/\./g,'').replace('$','').replace(',',''), 10) || 0; }
+function fmtPrice(n) { return Number(n).toLocaleString('es-VE') + '$'; }
+function getProteinCount(desc) {
+  if (!desc) return 0;
+  const m = desc.match(/(\d+) Proteín/);
+  return m ? parseInt(m[1]) : 0;
+}
+
+// ─── PROTEINS ────────────────────────────────────────────────────────────────
+document.getElementById('protein-cards').innerHTML = PROTEINS.map(p =>
+  `<div class="protein-card">
+     <span class="protein-emoji">${PROTEIN_EMOJI[p]||'🍴'}</span>
+     <span class="protein-name">${p}</span>
+   </div>`
+).join('');
+
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+let activeSection = 'cachapas';
+const navEl = document.getElementById('nav');
+function buildNav() {
+  navEl.innerHTML = SECTIONS.map(s =>
+    `<button class="nav-btn${s.id===activeSection?' active':''}" onclick="show('${s.id}')">${s.emoji} ${s.label}</button>`
+  ).join('');
+}
+function show(id) {
+  activeSection = id;
+  buildNav();
+  renderMain();
+  navEl.querySelector('.active')?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+buildNav();
+
+// ─── CART ────────────────────────────────────────────────────────────────────
+let cart = {};
+let cartView = 'cart';
+let lastOrderId = null;
+
+function cartCount() { return Object.values(cart).reduce((s,i)=>s+i.quantity, 0); }
+function cartTotal() { return Object.values(cart).reduce((s,i)=>s+i.priceNum*i.quantity, 0); }
+
+function addToCart(name, price, section) {
+  const key = section + '||' + name;
+  const priceNum = parsePrice(price);
+  if (cart[key]) cart[key].quantity++;
+  else cart[key] = {name, price, priceNum, quantity:1, section};
+  updateFab();
+}
+function incCart(key) { if (cart[key]) { cart[key].quantity++; updateFab(); renderCartBody(); } }
+function decCart(key) {
+  if (!cart[key]) return;
+  if (cart[key].quantity <= 1) delete cart[key];
+  else cart[key].quantity--;
+  updateFab();
+  renderCartBody();
+}
+function clearCart() { cart = {}; updateFab(); }
+function updateFab() {
+  const n = cartCount();
+  document.getElementById('cart-fab').style.display = n > 0 ? 'flex' : 'none';
+  document.getElementById('cart-count').textContent = n;
+}
+function handleAdd(name, price, section, desc) {
+  const count = getProteinCount(desc);
+  if (count > 0) openPicker(name, price, section, count);
+  else addToCart(name, price, section);
+}
+
+// ─── CART DRAWER ─────────────────────────────────────────────────────────────
+function openCart() {
+  cartView = 'cart';
+  renderCartBody();
+  document.getElementById('cart-overlay').classList.add('open');
+  document.getElementById('cart-drawer').classList.add('open');
+}
+function closeCart() {
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.getElementById('cart-drawer').classList.remove('open');
+}
+
+function renderCartBody() {
+  const titleEl    = document.getElementById('cart-title');
+  const subtitleEl = document.getElementById('cart-subtitle');
+  const bodyEl     = document.getElementById('cart-body');
+  const items      = Object.entries(cart);
+
+  if (cartView === 'success') {
+    titleEl.textContent = '¡Pedido Enviado!'; subtitleEl.textContent = '';
+    bodyEl.innerHTML = `<div class="success-view">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Pedido #${lastOrderId} Recibido</div>
+      <div class="success-msg">Tu pedido fue enviado al personal.<br>En breve lo estarán preparando.</div>
+      <button class="btn-success" onclick="closeCart()">Seguir Viendo el Menú</button>
+    </div>`;
+    return;
+  }
+
+  if (cartView === 'checkout') {
+    titleEl.textContent = 'Confirmar Pedido'; subtitleEl.textContent = '';
+    const summaryRows = items.map(([,i]) =>
+      `<div class="checkout-summary-row"><span>${i.quantity}× ${i.name}</span><span class="checkout-summary-price">${fmtPrice(i.priceNum*i.quantity)}</span></div>`
+    ).join('');
+    bodyEl.innerHTML = `
+      <div class="cart-scroll">
+        <div style="padding:20px 0 10px">
+          <div class="checkout-summary-label">Resumen</div>
+          ${summaryRows}
+          <div class="checkout-total-row">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;color:#888;text-transform:uppercase">Total</span>
+            <span style="font-family:'Bebas Neue',cursive;font-size:22px;color:#F5A800">${fmtPrice(cartTotal())}</span>
+          </div>
+        </div>
+        <label class="form-label">Nombre *</label>
+        <input id="f-name" class="form-input" placeholder="Tu nombre">
+        <label class="form-label">Mesa (opcional)</label>
+        <input id="f-mesa" class="form-input" placeholder="Ej: Mesa 3, Para llevar...">
+        <label class="form-label">Notas (opcional)</label>
+        <textarea id="f-notes" class="form-input" placeholder="Sin cebolla, extra salsa..."></textarea>
+        <div style="height:20px"></div>
+      </div>
+      <div class="cart-footer">
+        <div style="display:flex;gap:10px">
+          <button class="btn-secondary" onclick="cartView='cart';renderCartBody()">Volver</button>
+          <button id="confirm-btn" class="btn-primary" style="flex:2" onclick="submitOrder()">Confirmar Pedido</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  titleEl.textContent = 'Tu Pedido';
+  const count = cartCount();
+  subtitleEl.textContent = count > 0 ? count + (count===1?' ítem':' ítems') : '';
+
+  if (items.length === 0) {
+    bodyEl.innerHTML = `<div class="cart-scroll"><div class="cart-empty"><div class="cart-empty-icon">🛒</div><div class="cart-empty-text">Tu carrito está vacío</div></div></div>`;
+    return;
+  }
+
+  const rows = items.map(([key, item]) => {
+    const sk = encodeURIComponent(key);
+    return `<div class="cart-item">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${item.price}</div>
+      </div>
+      <div class="cart-item-controls">
+        <button class="qty-btn" data-key="${sk}" data-op="dec">−</button>
+        <span class="qty-num">${item.quantity}</span>
+        <button class="qty-btn" style="border-color:#F5A800;color:#F5A800" data-key="${sk}" data-op="inc">+</button>
+      </div>
+      <div class="cart-item-subtotal">${fmtPrice(item.priceNum*item.quantity)}</div>
+    </div>`;
+  }).join('');
+
+  bodyEl.innerHTML = `
+    <div class="cart-scroll" id="cart-scroll-inner">${rows}</div>
+    <div class="cart-footer">
+      <div class="cart-total-row">
+        <span class="cart-total-label">Total</span>
+        <span class="cart-total-val">${fmtPrice(cartTotal())}</span>
+      </div>
+      <button class="btn-primary" onclick="cartView='checkout';renderCartBody()">Hacer Pedido</button>
+    </div>`;
+
+  document.getElementById('cart-scroll-inner').addEventListener('click', function(e) {
+    const btn = e.target.closest('[data-op]');
+    if (!btn) return;
+    const key = decodeURIComponent(btn.dataset.key);
+    if (btn.dataset.op === 'dec') decCart(key);
+    else incCart(key);
+  });
+}
+
+async function submitOrder() {
+  const name = (document.getElementById('f-name')?.value||'').trim();
+  if (!name) { alert('Por favor ingresa tu nombre'); return; }
+  const btn = document.getElementById('confirm-btn');
+  if (btn) { btn.textContent='Enviando...'; btn.disabled=true; }
+  try {
+    const res = await fetch('/api/orders',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        customerName: name,
+        tableNumber: (document.getElementById('f-mesa')?.value||'').trim(),
+        notes: (document.getElementById('f-notes')?.value||'').trim(),
+        items: Object.values(cart).map(i=>({itemName:i.name,itemPrice:i.price,itemPriceNum:i.priceNum,quantity:i.quantity,section:i.section}))
+      })
+    });
+    if (!res.ok) throw new Error('Error');
+    const data = await res.json();
+    lastOrderId = data.id;
+    clearCart(); cartView='success'; renderCartBody();
+  } catch {
+    alert('Error al enviar el pedido. Intenta de nuevo.');
+    if (btn) { btn.textContent='Confirmar Pedido'; btn.disabled=false; }
+  }
+}
+
+// ─── PROTEIN PICKER ──────────────────────────────────────────────────────────
+let pickerState = null, pickerSelected = [];
+function openPicker(name, price, section, count) {
+  pickerState = {name, price, section, count}; pickerSelected = [];
+  document.getElementById('picker-item-name').textContent = name;
+  document.getElementById('picker-meta-label').textContent = count===1?'Elige 1 proteína':'Elige '+count+' proteínas';
+  renderPickerDots(); renderPickerGrid();
+  document.getElementById('picker-overlay').classList.add('open');
+}
+function closePicker() {
+  document.getElementById('picker-overlay').classList.remove('open');
+  pickerState=null; pickerSelected=[];
+}
+function renderPickerDots() {
+  const count = pickerState?.count||0;
+  document.getElementById('picker-dots').innerHTML = Array.from({length:count},(_,i)=>
+    `<div class="picker-dot${i<pickerSelected.length?' filled':''}"></div>`).join('');
+}
+function renderPickerGrid() {
+  const count = pickerState?.count||0;
+  document.getElementById('picker-grid').innerHTML = PROTEINS.map(p => {
+    const sel=pickerSelected.includes(p), dis=!sel&&pickerSelected.length>=count;
+    return `<button class="picker-protein-btn${sel?' selected':''}" data-protein="${p}" ${dis?'disabled':''}>
+      <span class="picker-protein-emoji">${PROTEIN_EMOJI[p]||'🍴'}</span>
+      <span class="picker-protein-label">${p}</span>
+      <span class="picker-checkmark">✓</span>
+    </button>`;
+  }).join('');
+  document.getElementById('picker-grid').onclick = function(e) {
+    const btn=e.target.closest('[data-protein]');
+    if (!btn||btn.disabled) return;
+    toggleProtein(btn.dataset.protein);
+  };
+  const ready = pickerSelected.length===count;
+  const cb = document.getElementById('picker-confirm');
+  cb.textContent = ready?'Agregar al Pedido':'Faltan '+(count-pickerSelected.length);
+  cb.className = 'picker-confirm'+(ready?' ready':'');
+}
+function toggleProtein(p) {
+  if (pickerSelected.includes(p)) pickerSelected=pickerSelected.filter(x=>x!==p);
+  else if (pickerSelected.length<pickerState.count) pickerSelected.push(p);
+  renderPickerDots(); renderPickerGrid();
+}
+function confirmPicker() {
+  if (!pickerState||pickerSelected.length!==pickerState.count) return;
+  addToCart(pickerState.name+' ('+pickerSelected.join(', ')+')', pickerState.price, pickerState.section);
+  closePicker();
+}
+
+// ─── RENDER MENU ─────────────────────────────────────────────────────────────
+function sectionHeader(emoji, title) {
+  return `<div class="section-header"><span>${emoji}</span><h2>${title}</h2></div>`;
+}
+function subHeader(emoji, title) {
+  return `<div class="sub-header"><span>${emoji}</span><h3>${title}</h3></div>`;
+}
+function menuRowHTML(item, section) {
+  return `<div class="menu-row${item.sep?' sep':''}">
+    <div class="menu-row-info">
+      <div class="menu-row-name">${item.name}</div>
+      ${item.desc?`<div class="menu-row-desc">${item.desc}</div>`:''}
+    </div>
+    <div class="menu-row-right">
+      <div class="menu-price">${item.price}</div>
+      <button class="add-btn menu-add" data-name="${encodeURIComponent(item.name)}" data-price="${item.price}" data-section="${section}" data-desc="${encodeURIComponent(item.desc||'')}">+</button>
+    </div>
+  </div>`;
+}
+function comboCardHTML(item, section, descForPicker) {
+  const includes = item.includes.map(l=>`<div>${l}</div>`).join('');
+  return `<div class="combo-card">
+    <div class="combo-accent"></div>
+    <div class="combo-badge">${item.badge}</div>
+    <div class="combo-name">${item.name}</div>
+    <div class="combo-includes">${includes}</div>
+    <div class="combo-footer">
+      <div class="combo-price">${item.price}</div>
+      <button class="combo-add-btn menu-add" data-name="${encodeURIComponent(item.name)}" data-price="${item.price}" data-section="${section}" data-desc="${encodeURIComponent(descForPicker||'')}">+ Agregar</button>
+    </div>
+  </div>`;
+}
+
+function renderMain() {
+  const mainEl = document.getElementById('main');
+  let html = '<div class="section-content">';
+  const s = activeSection;
+
+  if (s==='cachapas') {
+    html += sectionHeader('🌽','Cachapas');
+    html += CACHAPAS.map(i=>menuRowHTML(i,'cachapas')).join('');
+  } else if (s==='burgers') {
+    html += sectionHeader('🍔','Hamburguesas');
+    html += `<p class="section-note">${BURGERS_NOTE}</p>`;
+    html += BURGERS.map(i=>menuRowHTML(i,'burgers')).join('');
+  } else if (s==='hotdogs') {
+    html += sectionHeader('🌭','Perros Calientes');
+    html += HOTDOGS.map(i=>menuRowHTML(i,'hotdogs')).join('');
+  } else if (s==='burritos') {
+    html += sectionHeader('🌯','Burritos');
+    html += `<p class="section-note">${BURRITOS_NOTE}</p>`;
+    html += BURRITOS.map(i=>menuRowHTML(i,'burritos')).join('');
+  } else if (s==='morocho') {
+    html += sectionHeader('🥙','Morocho');
+    html += MOROCHO.map(i=>comboCardHTML(i,'morocho','')).join('');
+  } else if (s==='especiales') {
+    html += sectionHeader('⭐','Especiales');
+    html += ESPECIALES.map(i=>comboCardHTML(i,'especiales',i.includes[0]||'')).join('');
+    html += subHeader('🥗','Ensaladas');
+    html += ENSALADAS.map(i=>comboCardHTML(i,'ensaladas','')).join('');
+  } else if (s==='papas') {
+    html += sectionHeader('🍟','Papas');
+    html += PAPAS.map(i=>menuRowHTML(i,'papas')).join('');
+  } else if (s==='combos') {
+    html += sectionHeader('🔥','Combos');
+    html += COMBOS.map(i=>comboCardHTML(i,'combos',i.desc||'')).join('');
+  } else if (s==='adicionales') {
+    html += sectionHeader('➕','Adicionales');
+    html += '<div class="adicionales-grid">';
+    html += ADICIONALES.map(i=>
+      `<div class="add-item">
+         <span class="add-item-name">${i.name}</span>
+         <div class="add-item-right">
+           <span class="add-item-price">${i.price}</span>
+           <button class="mini-add-btn menu-add" data-name="${encodeURIComponent(i.name)}" data-price="${i.price}" data-section="adicionales" data-desc="">+</button>
+         </div>
+       </div>`
+    ).join('');
+    html += '</div>';
+  } else if (s==='bebidas') {
+    html += sectionHeader('🥤','Bebidas');
+    html += BEBIDAS.map(i=>
+      `<div class="drink-item">
+         <span class="drink-name">${i.name}</span>
+         <div class="drink-right">
+           <span class="drink-price">${i.price}</span>
+           <button class="mini-add-btn menu-add" data-name="${encodeURIComponent(i.name)}" data-price="${i.price}" data-section="bebidas" data-desc="">+</button>
+         </div>
+       </div>`
+    ).join('');
+  }
+
+  html += '</div>';
+  mainEl.innerHTML = html;
+
+  mainEl.addEventListener('click', function(e) {
+    const btn = e.target.closest('.menu-add');
+    if (!btn) return;
+    handleAdd(
+      decodeURIComponent(btn.dataset.name),
+      btn.dataset.price,
+      btn.dataset.section,
+      decodeURIComponent(btn.dataset.desc)
+    );
+  });
+}
+
+renderMain();
+</script>
+</body>
+</html>
