@@ -17,7 +17,7 @@ interface CartProps {
   onClear: () => void;
 }
 
-const BASE = import.meta.env.BASE_URL ?? "/";
+const BASE = import.meta.env.VITE_API_URL ?? "/";
 
 function formatPrice(num: number): string {
   return num.toLocaleString("es-VE") + "$";
