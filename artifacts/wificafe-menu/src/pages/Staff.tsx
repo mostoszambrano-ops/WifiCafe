@@ -8,7 +8,7 @@ import {
 } from "@/data/menu";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
-const BASE = import.meta.env.BASE_URL ?? "/";
+const BASE = import.meta.env.VITE_API_URL ?? "/";
 
 type Stats = {
   salesByDay: { day: string; total: number; count: number }[];
